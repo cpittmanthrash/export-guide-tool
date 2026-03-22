@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expat Family Guide — Personalized Relocation Research</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f7f6f3; font-family: 'Georgia', serif; color: #1a1a1a; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; }
+    a { color: #2d5986; }
+
+    .step-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .step-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 6px;
+    }
+    .step-title {
+      font-size: 1.2rem;
+      font-weight: normal;
+      color: #1e3a5f;
+      margin-bottom: 1rem;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 140px;
+    }
+    .input-group label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .input-group input, .input-group select {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #fafafa;
+    }
+    .input-group input:focus, .input-group select:focus {
+      outline: none;
+      border-color: #2d5986;
+      background: white;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #e8f0fb;
+      border: 1px solid #bfdbfe;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #1e3a5f;
+    }
+    .tag button {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 14px;
+      padding: 0;
+      line-height: 1;
+    }
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .priority-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: #f8f9fb;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      cursor: grab;
+      user-select: none;
+      transition: box-shadow 0.15s;
+    }
+    .priority-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .priority-rank {
+      width: 24px; height: 24px;
+      background: #1e3a5f;
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: bold; flex-shrink: 0;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #1e3a5f, #2d5986);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary {
+      background: white;
+      color: #1e3a5f;
+      border: 1px solid #1e3a5f;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .btn-secondary:hover { background: #f0f6ff; }
+    .dest-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dest-chip.selected {
+      background: #1e3a5f;
+      color: white;
+      border-color: #1e3a5f;
+    }
+    .dest-chip:hover:not(.selected) { background: #f0f6ff; border-color: #2d5986; }
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+    }
+    .payment-box {
+      background: linear-gradient(135deg, #1e3a5f, #2d5986);
+      color: white;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .loading-pulse {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 3rem;
+      text-align: center;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #1e3a5f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .guide-header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5986 50%, #1a4a73 100%);
+      padding: 2rem;
+      color: white;
+      border-bottom: 4px solid #c9a84c;
+      border-radius: 12px 12px 0 0;
+    }
+    .dest-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .dest-card-header {
+      padding: 1rem 1.25rem;
+      background: linear-gradient(135deg, #1e3a5f, #2d5986);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dest-card-body {
+      padding: 1.25rem;
+    }
+    .category-row {
+      border-top: 1px solid #f0f4f8;
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    .source-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      padding: 4px 8px;
+      background: #f0f6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      color: #2d5986;
+      text-decoration: none;
+      margin: 3px;
+    }
+    .source-link:hover { background: #dbeafe; }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .checkbox-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: white;
+    }
+    .checkbox-chip.checked {
+      background: #e8f0fb;
+      border-color: #2d5986;
+      color: #1e3a5f;
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+
+  // ── CONFIGURATION ──────────────────────────────────────────────────────────
+  // Replace with your Vercel backend URL after deploying
+  const API_BASE = 'https://expat-guide-a9t36di0a-cpittmanthrashs-projects.vercel.app';
+  // ──────────────────────────────────────────────────────────────────────────
+
+  const CURATED_DESTINATIONS = [
+    { name: "Mexico City, Mexico", flag: "🇲🇽" },
+    { name: "Oaxaca, Mexico", flag: "🇲🇽" },
+    { name: "San Miguel de Allende, Mexico", flag: "🇲🇽" },
+    { name: "Mérida, Mexico", flag: "🇲🇽" },
+    { name: "Puerto Vallarta, Mexico", flag: "🇲🇽" },
+    { name: "Montréal, Canada", flag: "🇨🇦" },
+    { name: "Québec City, Canada", flag: "🇨🇦" },
+    { name: "Vancouver, Canada", flag: "🇨🇦" },
+    { name: "Toronto, Canada", flag: "🇨🇦" },
+    { name: "Costa Rica (San José area)", flag: "🇨🇷" },
+    { name: "Paris, France", flag: "🇫🇷" },
+    { name: "Montpellier, France", flag: "🇫🇷" },
+    { name: "Lyon, France", flag: "🇫🇷" },
+    { name: "Barcelona, Spain", flag: "🇪🇸" },
+    { name: "Madrid, Spain", flag: "🇪🇸" },
+    { name: "Seville, Spain", flag: "🇪🇸" },
+    { name: "Valencia, Spain", flag: "🇪🇸" },
+    { name: "London, UK", flag: "🇬🇧" },
+    { name: "Edinburgh, UK", flag: "🇬🇧" },
+    { name: "Lisbon, Portugal", flag: "🇵🇹" },
+    { name: "Porto, Portugal", flag: "🇵🇹" },
+    { name: "Amsterdam, Netherlands", flag: "🇳🇱" },
+    { name: "Berlin, Germany", flag: "🇩🇪" },
+    { name: "Munich, Germany", flag: "🇩🇪" },
+    { name: "Vienna, Austria", flag: "🇦🇹" },
+    { name: "Prague, Czech Republic", flag: "🇨🇿" },
+    { name: "Kraków, Poland", flag: "🇵🇱" },
+    { name: "Oslo, Norway", flag: "🇳🇴" },
+    { name: "Copenhagen, Denmark", flag: "🇩🇰" },
+    { name: "Stockholm, Sweden", flag: "🇸🇪" },
+    { name: "Tokyo, Japan", flag: "🇯🇵" },
+    { name: "Osaka, Japan", flag: "🇯🇵" },
+    { name: "Kyoto, Japan", flag: "🇯🇵" },
+    { name: "Chiang Mai, Thailand", flag: "🇹🇭" },
+    { name: "Bangkok, Thailand", flag: "🇹🇭" },
+    { name: "Medellín, Colombia", flag: "🇨🇴" },
+    { name: "Buenos Aires, Argentina", flag: "🇦🇷" },
+    { name: "Tbilisi, Georgia", flag: "🇬🇪" },
+    { name: "Bali, Indonesia", flag: "🇮🇩" },
+    { name: "Melbourne, Australia", flag: "🇦🇺" },
+  ];
+
+  const ALL_PRIORITIES = [
+    "Ease of visa/logistics",
+    "Affordability",
+    "Quality of life",
+    "Safety",
+    "English-friendliness",
+    "Transit/walkability (no car)",
+    "Child education",
+    "Easy flights home",
+    "Pet-friendliness",
+    "Weather/climate",
+    "Healthcare quality",
+    "Expat community",
+  ];
+
+  const WORK_SITUATIONS = [
+    "Remote employee (US employer)",
+    "Freelancer / self-employed",
+    "Retired / passive income",
+    "Sabbatical / unpaid leave",
+    "Student",
+    "Seeking local employment",
+  ];
+
+  const PET_TYPES = ["Cat", "Dog", "Other"];
+
+  const scoreColor = (s) => s >= 4 ? "#16a34a" : s === 3 ? "#ca8a04" : "#dc2626";
+
+  // ── DRAG TO REORDER PRIORITIES ─────────────────────────────────────────────
+  function PriorityRanker({ priorities, onChange }) {
+    const dragItem = useRef(null);
+    const dragOver = useRef(null);
+
+    const handleDragStart = (i) => { dragItem.current = i; };
+    const handleDragEnter = (i) => { dragOver.current = i; };
+    const handleDragEnd = () => {
+      const arr = [...priorities];
+      const dragged = arr.splice(dragItem.current, 1)[0];
+      arr.splice(dragOver.current, 0, dragged);
+      dragItem.current = null;
+      dragOver.current = null;
+      onChange(arr);
+    };
+
+    return (
+      <div>
+        <p style={{ fontSize: 12, color: "#666", marginBottom: 10 }}>Drag to reorder — #1 is most important to your family</p>
+        {priorities.map((p, i) => (
+          <div key={p} className="priority-item"
+            draggable
+            onDragStart={() => handleDragStart(i)}
+            onDragEnter={() => handleDragEnter(i)}
+            onDragEnd={handleDragEnd}
+            onDragOver={e => e.preventDefault()}>
+            <div className="priority-rank">{i + 1}</div>
+            <span style={{ fontSize: 13, flex: 1 }}>{p}</span>
+            <span style={{ color: "#ccc", fontSize: 16 }}>⠿</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // ── GUIDE DISPLAY ──────────────────────────────────────────────────────────
+  function GuideDisplay({ guide, profile }) {
+    const [expanded, setExpanded] = useState(0);
+
+    const cats = [
+      { id: "visa", label: "Visa", icon: "✈️" },
+      { id: "cost", label: "Cost", icon: "💰" },
+      { id: "transit", label: "Transit", icon: "🚶" },
+      { id: "schooling", label: "Schooling", icon: "🎒" },
+      { id: "pets", label: "Pets", icon: "🐾" },
+      { id: "safety", label: "Safety", icon: "🛡️" },
+      { id: "flights", label: "Flights", icon: "🛫" },
+      { id: "english", label: "English", icon: "🗣️" },
+    ];
+
+    return (
+      <div>
+        <div className="guide-header">
+          <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c9a84c", marginBottom: 6 }}>Your Personalized Expat Guide</div>
+          <h1 style={{ fontSize: "clamp(1.3rem, 3vw, 2rem)", fontWeight: "normal", marginBottom: 8 }}>Where Should Your Family Live?</h1>
+          <p style={{ fontSize: 13, color: "#b8cfe8" }}>{guide.familySummary}</p>
+          {guide.topPick && (
+            <div style={{ marginTop: 12, padding: "10px 14px", background: "rgba(201,168,76,0.2)", border: "1px solid #c9a84c", borderRadius: 8, fontSize: 13 }}>
+              ⭐ <strong>Top pick for your family:</strong> {guide.topPick}
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: "1.5rem 0" }}>
+          {guide.dealBreakers && guide.dealBreakers.length > 0 && (
+            <div style={{ padding: "1rem 1.25rem", background: "#fef3c7", border: "1px solid #f59e0b", borderRadius: 8, marginBottom: 16 }}>
+              <strong style={{ fontSize: 13, color: "#92400e" }}>⚠️ Deal-breakers for your family</strong>
+              <ul style={{ margin: "6px 0 0 0", paddingLeft: 18, fontSize: 12, color: "#78350f", lineHeight: 1.8 }}>
+                {guide.dealBreakers.map((d, i) => <li key={i}>{d}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {guide.destinations && guide.destinations.map((dest, di) => (
+            <div key={di} className="dest-card">
+              <div className="dest-card-header" onClick={() => setExpanded(expanded === di ? -1 : di)}>
+                <span style={{ fontSize: 28 }}>{dest.flag}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 15 }}>{dest.name}</div>
+                  <div style={{ fontSize: 12, color: "#b8cfe8", marginTop: 2 }}>{dest.tagline}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                  {cats.map(c => {
+                    const score = dest.scores?.[c.id]?.score || 0;
+                    return (
+                      <div key={c.id} title={c.label} style={{
+                        width: 22, height: 22, borderRadius: "50%",
+                        background: scoreColor(score),
+                        color: "white", fontSize: 10, fontWeight: "bold",
+                        display: "flex", alignItems: "center", justifyContent: "center"
+                      }}>{score}</div>
+                    );
+                  })}
+                </div>
+                <span style={{ marginLeft: 8, fontSize: 18, color: "#b8cfe8" }}>{expanded === di ? "▲" : "▼"}</span>
+              </div>
+
+              {expanded === di && (
+                <div className="dest-card-body">
+                  {/* Priority Analysis */}
+                  {dest.priorityAnalysis && (
+                    <div style={{ padding: "10px 12px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 8, marginBottom: 14, fontSize: 13, color: "#0c4a6e" }}>
+                      🎯 <strong>For your family specifically:</strong> {dest.priorityAnalysis}
+                    </div>
+                  )}
+
+                  {/* Pros / Cons */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+                    <div style={{ padding: "10px", background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
+                      <strong style={{ fontSize: 11, color: "#166534", display: "block", marginBottom: 6 }}>✅ PROS</strong>
+                      {dest.pros?.map((p, i) => <div key={i} style={{ fontSize: 12, color: "#166534", marginBottom: 3 }}>• {p}</div>)}
+                    </div>
+                    <div style={{ padding: "10px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
+                      <strong style={{ fontSize: 11, color: "#991b1b", display: "block", marginBottom: 6 }}>⚠️ CONS</strong>
+                      {dest.cons?.map((c, i) => <div key={i} style={{ fontSize: 12, color: "#991b1b", marginBottom: 3 }}>• {c}</div>)}
+                    </div>
+                  </div>
+
+                  {/* Category details */}
+                  {cats.map(cat => {
+                    const data = dest.scores?.[cat.id];
+                    if (!data) return null;
+                    const score = data.score || 0;
+                    const color = scoreColor(score);
+                    return (
+                      <div key={cat.id} className="category-row">
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                          <span>{cat.icon}</span>
+                          <strong style={{ fontSize: 13 }}>{cat.label}</strong>
+                          <div className="score-badge" style={{ background: color }}>{score}</div>
+                          {data.label && <span style={{ fontSize: 10, padding: "2px 6px", background: color + "15", color: color, borderRadius: 4, border: `1px solid ${color}30`, fontWeight: 600 }}>{data.label}</span>}
+                        </div>
+                        <p style={{ fontSize: 12, color: "#444", marginBottom: 4 }}>{data.summary}</p>
+                        {data.tailored && (
+                          <p style={{ fontSize: 11, color: "#2d5986", fontStyle: "italic", marginBottom: 4 }}>→ For your family: {data.tailored}</p>
+                        )}
+                        {data.monthly && (
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                            <span style={{ fontSize: 11, padding: "3px 8px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 4 }}>Monthly: {data.monthly}</span>
+                            {data.rent && <span style={{ fontSize: 11, padding: "3px 8px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: 4 }}>Rent: {data.rent}</span>}
+                          </div>
+                        )}
+                        {data.hub && (
+                          <div style={{ fontSize: 11, marginTop: 4, padding: "3px 8px", background: "#fafaf0", border: "1px solid #e0e0a0", borderRadius: 4, display: "inline-block" }}>Route: {data.hub}</div>
+                        )}
+                        {data.details && data.details.length > 0 && (
+                          <ul style={{ margin: "6px 0 0 0", paddingLeft: 16, fontSize: 11, color: "#555", lineHeight: 1.8 }}>
+                            {data.details.map((d, i) => (
+                              <li key={i} style={{ color: d.includes("⚠️") || d.includes("START") ? "#dc2626" : "#555" }}>{d}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Sources */}
+                  {dest.sources && dest.sources.length > 0 && (
+                    <div style={{ borderTop: "1px solid #e8eef4", paddingTop: 12, marginTop: 12 }}>
+                      <strong style={{ fontSize: 11, color: "#1e3a5f", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" }}>🔗 Sources</strong>
+                      <div style={{ display: "flex", flexWrap: "wrap" }}>
+                        {dest.sources.map((s, i) => (
+                          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="source-link">↗ {s.label}</a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: "center", fontSize: 11, color: "#999", paddingTop: 16, borderTop: "1px solid #e8eef4" }}>
+          Generated {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} •
+          Visa rules and costs change frequently — verify with official consulate and government sources •
+          Not legal or immigration advice
+        </div>
+      </div>
+    );
+  }
+
+  // ── MAIN APP ───────────────────────────────────────────────────────────────
+  function App() {
+    const [step, setStep] = useState(1);
+    const [profile, setProfile] = useState({
+      adults: 2,
+      children: [],
+      pets: [],
+      monthlyBudget: 4000,
+      workSituation: 'Remote employee (US employer)',
+      homeAirport: '',
+      carFree: true,
+      mustHaves: [],
+      destinations: [],
+      priorities: ALL_PRIORITIES.slice(0, 8),
+    });
+    const [customDest, setCustomDest] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [guide, setGuide] = useState(null);
+    const [error, setError] = useState(null);
+
+    // Check for Stripe return
+    useEffect(() => {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      const cancelled = params.get('cancelled');
+
+      if (sessionId) {
+        const savedProfile = localStorage.getItem('expat_profile');
+        if (savedProfile) {
+          setLoading(true);
+          setStep(5);
+          generateGuide(sessionId, JSON.parse(savedProfile));
+        }
+      }
+      if (cancelled) {
+        setError('Payment was cancelled. You can try again below.');
+        setStep(4);
+      }
+    }, []);
+
+    const generateGuide = async (sessionId, profileData) => {
+      try {
+        const res = await fetch(`${API_BASE}/api/generate-guide`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, userProfile: profileData }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        setGuide(data.guide);
+        setStep(6);
+        localStorage.removeItem('expat_profile');
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
+      } catch (err) {
+        setError('Something went wrong generating your guide. Please contact support.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handlePayment = async () => {
+      if (profile.destinations.length === 0) {
+        setError('Please add at least one destination.');
+        return;
+      }
+      setError(null);
+      setLoading(true);
+      try {
+        localStorage.setItem('expat_profile', JSON.stringify(profile));
+        const res = await fetch(`${API_BASE}/api/create-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userProfile: profile }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        window.location.href = data.url;
+      } catch (err) {
+        setError('Could not connect to payment server. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    const addChild = () => setProfile(p => ({ ...p, children: [...p.children, { age: 4 }] }));
+    const removeChild = (i) => setProfile(p => ({ ...p, children: p.children.filter((_, idx) => idx !== i) }));
+    const updateChildAge = (i, age) => setProfile(p => ({ ...p, children: p.children.map((c, idx) => idx === i ? { age: parseInt(age) } : c) }));
+
+    const addPet = () => setProfile(p => ({ ...p, pets: [...p.pets, { type: 'Cat', count: 1 }] }));
+    const removePet = (i) => setProfile(p => ({ ...p, pets: p.pets.filter((_, idx) => idx !== i) }));
+    const updatePet = (i, field, val) => setProfile(p => ({ ...p, pets: p.pets.map((pet, idx) => idx === i ? { ...pet, [field]: val } : pet) }));
+
+    const toggleDestination = (name) => {
+      setProfile(p => ({
+        ...p,
+        destinations: p.destinations.includes(name)
+          ? p.destinations.filter(d => d !== name)
+          : [...p.destinations, name],
+      }));
+    };
+
+    const addCustomDest = () => {
+      const trimmed = customDest.trim();
+      if (trimmed && !profile.destinations.includes(trimmed)) {
+        setProfile(p => ({ ...p, destinations: [...p.destinations, trimmed] }));
+        setCustomDest('');
+      }
+    };
+
+    const toggleMustHave = (item) => {
+      setProfile(p => ({
+        ...p,
+        mustHaves: p.mustHaves.includes(item)
+          ? p.mustHaves.filter(m => m !== item)
+          : [...p.mustHaves, item],
+      }));
+    };
+
+    const mustHaveOptions = ["Car-free lifestyle (transit/walk/bike)","School for children","Pet import possible","English widely spoken","Under $3,000/mo","Under $5,000/mo","Direct flights to East Coast US","Warm weather year-round","Strong expat community","Healthcare quality"];
+
+    const progress = Math.round((Math.min(step, 4) / 4) * 100);
+
+    if (step === 5 || loading) {
+      return (
+        <div style={{ maxWidth: 600, margin: "4rem auto", padding: "0 1rem" }}>
+          <div className="loading-pulse">
+            <div className="spinner" />
+            <h2 style={{ fontWeight: "normal", color: "#1e3a5f" }}>Generating your personalized guide…</h2>
+            <p style={{ color: "#666", fontSize: 14 }}>Claude is researching each destination based on your family's specific profile. This takes about 30–60 seconds.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+              {["Analyzing visa requirements for your work situation…","Scoring affordability against your budget…","Evaluating pet import complexity…","Checking school options for your children's ages…","Calculating flight routes from your home airport…"].map((msg, i) => (
+                <div key={i} style={{ fontSize: 12, color: "#888", display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ color: "#c9a84c" }}>→</span> {msg}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 6 && guide) {
+      return (
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "1rem" }}>
+          <GuideDisplay guide={guide} profile={profile} />
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ maxWidth: 700, margin: "0 auto", padding: "1rem" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", padding: "2rem 1rem 1.5rem", borderBottom: "1px solid #e8eef4", marginBottom: "1.5rem" }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c9a84c", marginBottom: 6 }}>Expat Family Research Tool</div>
+          <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 2.2rem)", fontWeight: "normal", color: "#1e3a5f", marginBottom: 8 }}>Where Should Your Family Live for a Year?</h1>
+          <p style={{ color: "#666", fontSize: 14 }}>Tell us about your family. We'll generate a personalized guide scoring your chosen destinations across visa logistics, cost, schools, pets, transit, and more.</p>
+          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ flex: 1, height: 4, background: "#e8eef4", borderRadius: 2 }}>
+              <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #1e3a5f, #2d5986)", borderRadius: 2, transition: "width 0.3s" }} />
+            </div>
+            <span style={{ fontSize: 11, color: "#666", whiteSpace: "nowrap" }}>Step {Math.min(step, 4)} of 4</span>
+          </div>
+        </div>
+
+        {error && (
+          <div style={{ padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, marginBottom: 16, fontSize: 13, color: "#991b1b" }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        {/* STEP 1 — Family Profile */}
+        {step === 1 && (
+          <div>
+            <div className="step-card">
+              <div className="step-label">Step 1 of 4</div>
+              <div className="step-title">Tell us about your family</div>
+
+              <div className="input-row">
+                <div className="input-group">
+                  <label>Number of Adults</label>
+                  <select value={profile.adults} onChange={e => setProfile(p => ({ ...p, adults: parseInt(e.target.value) }))}>
+                    {[1,2,3,4].map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Monthly Budget (USD)</label>
+                  <input type="number" value={profile.monthlyBudget} min={500} step={500}
+                    onChange={e => setProfile(p => ({ ...p, monthlyBudget: parseInt(e.target.value) }))} />
+                </div>
+              </div>
+
+              <div className="input-row">
+                <div className="input-group" style={{ flex: 2 }}>
+                  <label>Work Situation</label>
+                  <select value={profile.workSituation} onChange={e => setProfile(p => ({ ...p, workSituation: e.target.value }))}>
+                    {WORK_SITUATIONS.map(w => <option key={w} value={w}>{w}</option>)}
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Home Airport (code)</label>
+                  <input type="text" placeholder="e.g. ORF, DCA, RIC" maxLength={5}
+                    value={profile.homeAirport}
+                    onChange={e => setProfile(p => ({ ...p, homeAirport: e.target.value.toUpperCase() }))} />
+                </div>
+              </div>
+
+              {/* Children */}
+              <div style={{ marginTop: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Children</label>
+                  <button className="btn-secondary" onClick={addChild} style={{ fontSize: 12, padding: "4px 10px" }}>+ Add Child</button>
+                </div>
+                {profile.children.length === 0 && <p style={{ fontSize: 12, color: "#aaa" }}>No children added</p>}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {profile.children.map((c, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 10px", background: "#f8f9fb", border: "1px solid #e2e8f0", borderRadius: 8 }}>
+                      <span style={{ fontSize: 12 }}>🧒</span>
+                      <input type="number" value={c.age} min={0} max={17} style={{ width: 40, padding: "2px 4px", border: "1px solid #d1d5db", borderRadius: 4, fontSize: 12, textAlign: "center" }}
+                        onChange={e => updateChildAge(i, e.target.value)} />
+                      <span style={{ fontSize: 11, color: "#666" }}>yrs</span>
+                      <button onClick={() => removeChild(i)} style={{ background: "none", border: "none", color: "#999", fontSize: 14 }}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pets */}
+              <div style={{ marginTop: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em" }}>Pets</label>
+                  <button className="btn-secondary" onClick={addPet} style={{ fontSize: 12, padding: "4px 10px" }}>+ Add Pet</button>
+                </div>
+                {profile.pets.length === 0 && <p style={{ fontSize: 12, color: "#aaa" }}>No pets added</p>}
+                {profile.pets.map((pet, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <select value={pet.type} onChange={e => updatePet(i, 'type', e.target.value)} style={{ padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: 6, fontSize: 13 }}>
+                      {PET_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <input type="number" value={pet.count} min={1} max={10} style={{ width: 50, padding: "6px 8px", border: "1px solid #d1d5db", borderRadius: 6, fontSize: 13, textAlign: "center" }}
+                      onChange={e => updatePet(i, 'count', parseInt(e.target.value))} />
+                    <span style={{ fontSize: 12, color: "#666" }}>animal(s)</span>
+                    <button onClick={() => removePet(i)} style={{ background: "none", border: "none", color: "#999", fontSize: 16 }}>×</button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Car-free */}
+              <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 10 }}>
+                <input type="checkbox" id="carfree" checked={profile.carFree}
+                  onChange={e => setProfile(p => ({ ...p, carFree: e.target.checked }))}
+                  style={{ width: 16, height: 16, cursor: "pointer" }} />
+                <label htmlFor="carfree" style={{ fontSize: 13, cursor: "pointer" }}>
+                  🚶 We prefer <strong>car-free living</strong> (transit, walking, biking)
+                </label>
+              </div>
+            </div>
+
+            {/* Must-haves */}
+            <div className="step-card">
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#1e3a5f", marginBottom: 8 }}>Any deal-breakers or must-haves?</div>
+              <div className="checkbox-group">
+                {mustHaveOptions.map(item => (
+                  <div key={item} className={`checkbox-chip ${profile.mustHaves.includes(item) ? 'checked' : ''}`}
+                    onClick={() => toggleMustHave(item)}>
+                    {profile.mustHaves.includes(item) ? '✓' : '+'} {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button className="btn-primary" onClick={() => setStep(2)}>Next: Choose Destinations →</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 2 — Destinations */}
+        {step === 2 && (
+          <div>
+            <div className="step-card">
+              <div className="step-label">Step 2 of 4</div>
+              <div className="step-title">Which destinations should we research?</div>
+              <p style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>Select from the curated list below, or type in any city. We recommend 3–8 destinations for the best guide.</p>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+                {CURATED_DESTINATIONS.map(d => (
+                  <div key={d.name} className={`dest-chip ${profile.destinations.includes(d.name) ? 'selected' : ''}`}
+                    onClick={() => toggleDestination(d.name)}>
+                    {d.flag} {d.name}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderTop: "1px solid #e8eef4", paddingTop: 14 }}>
+                <label style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Add a custom destination</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input type="text" placeholder="e.g. Tbilisi, Georgia" value={customDest}
+                    onChange={e => setCustomDest(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && addCustomDest()}
+                    style={{ flex: 1, padding: "8px 10px", border: "1px solid #d1d5db", borderRadius: 6, fontSize: 14 }} />
+                  <button className="btn-secondary" onClick={addCustomDest}>Add</button>
+                </div>
+              </div>
+
+              {profile.destinations.length > 0 && (
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontSize: 12, color: "#1e3a5f", fontWeight: 600, marginBottom: 6 }}>Selected ({profile.destinations.length}):</div>
+                  <div className="tag-list">
+                    {profile.destinations.map(d => (
+                      <div key={d} className="tag">
+                        {d}
+                        <button onClick={() => toggleDestination(d)}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button className="btn-secondary" onClick={() => setStep(1)}>← Back</button>
+              <button className="btn-primary" onClick={() => setStep(3)} disabled={profile.destinations.length === 0}>
+                Next: Set Priorities →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3 — Priorities */}
+        {step === 3 && (
+          <div>
+            <div className="step-card">
+              <div className="step-label">Step 3 of 4</div>
+              <div className="step-title">Rank what matters most to your family</div>
+              <PriorityRanker
+                priorities={profile.priorities}
+                onChange={(newOrder) => setProfile(p => ({ ...p, priorities: newOrder }))}
+              />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button className="btn-secondary" onClick={() => setStep(2)}>← Back</button>
+              <button className="btn-primary" onClick={() => setStep(4)}>Next: Review & Pay →</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4 — Review & Pay */}
+        {step === 4 && (
+          <div>
+            <div className="step-card">
+              <div className="step-label">Step 4 of 4</div>
+              <div className="step-title">Review your profile</div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+                {[
+                  ["👨‍👩‍👧", "Family", `${profile.adults} adult(s)${profile.children.length > 0 ? `, ${profile.children.map(c => `${c.age}yo`).join(', ')}` : ''}`],
+                  ["💼", "Work", profile.workSituation],
+                  ["💰", "Budget", `$${profile.monthlyBudget.toLocaleString()}/mo`],
+                  ["✈️", "Home airport", profile.homeAirport || "Not set"],
+                  ["🐾", "Pets", profile.pets.length > 0 ? profile.pets.map(p => `${p.count} ${p.type}`).join(', ') : "None"],
+                  ["🚶", "Car-free", profile.carFree ? "Yes, preferred" : "Car is OK"],
+                ].map(([icon, label, value]) => (
+                  <div key={label} style={{ padding: "10px 12px", background: "#f8f9fb", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                    <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>{icon} {label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500 }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: "#666", marginBottom: 6 }}>📍 Destinations ({profile.destinations.length})</div>
+                <div className="tag-list">
+                  {profile.destinations.map(d => <span key={d} className="tag">{d}</span>)}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 12, color: "#666", marginBottom: 6 }}>🎯 Top priorities</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {profile.priorities.slice(0, 4).map((p, i) => (
+                    <span key={p} style={{ fontSize: 11, padding: "3px 8px", background: "#e8f0fb", border: "1px solid #bfdbfe", borderRadius: 12, color: "#1e3a5f" }}>
+                      {i + 1}. {p}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="payment-box">
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🗺️</div>
+              <h2 style={{ fontWeight: "normal", marginBottom: 8 }}>Your personalized guide is ready to generate</h2>
+              <p style={{ fontSize: 13, color: "#b8cfe8", marginBottom: 20 }}>
+                Claude will research each of your {profile.destinations.length} destinations tailored to your exact family profile —
+                visa options for your work situation, costs vs. your budget, pet import specifics, and more.
+              </p>
+              <div style={{ fontSize: 13, color: "#e2e8f0", marginBottom: 20 }}>
+                {profile.destinations.length} destinations × 8 categories = comprehensive research report
+              </div>
+              <button className="btn-primary"
+                style={{ background: "white", color: "#1e3a5f", fontSize: 16, padding: "14px 36px" }}
+                onClick={handlePayment}
+                disabled={loading}>
+                {loading ? 'Connecting to payment…' : 'Generate My Guide — $5'}
+              </button>
+              <p style={{ fontSize: 11, color: "#7fb3d3", marginTop: 12 }}>Secure payment via Stripe • One-time charge</p>
+            </div>
+
+            <div style={{ marginTop: 12, display: "flex", justifyContent: "flex-start" }}>
+              <button className="btn-secondary" onClick={() => setStep(3)}>← Back</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
