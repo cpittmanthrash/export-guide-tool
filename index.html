@@ -4,15 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Expat Family Guide — Personalized Relocation Research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #f7f6f3; font-family: 'Georgia', serif; color: #1a1a1a; }
+    body { background: #f7f6f3; font-family: 'DM Sans', system-ui, sans-serif; color: #1a1a1a; font-size: 15px; line-height: 1.6; }
     button { font-family: inherit; cursor: pointer; }
     input, select, textarea { font-family: inherit; }
     a { color: #2d5986; }
+    h1, h2, .step-title, .guide-header h1 { font-family: 'DM Serif Display', Georgia, serif; }
 
     .step-card {
       background: white;
@@ -48,16 +51,16 @@
       min-width: 140px;
     }
     .input-group label {
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 12px;
+      color: #555;
+      font-weight: 500;
+      letter-spacing: 0.02em;
     }
     .input-group input, .input-group select {
-      padding: 8px 10px;
+      padding: 9px 12px;
       border: 1px solid #d1d5db;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 15px;
       background: #fafafa;
     }
     .input-group input:focus, .input-group select:focus {
@@ -94,7 +97,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 14px;
+      padding: 11px 14px;
       background: #f8f9fb;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -261,7 +264,7 @@
 
   // ── CONFIGURATION ──────────────────────────────────────────────────────────
   // Replace with your Vercel backend URL after deploying
-  const API_BASE = 'https://expat-guide-api-git-main-cpittmanthrashs-projects.vercel.app';
+  const API_BASE = 'https://YOUR-VERCEL-APP.vercel.app';
   // ──────────────────────────────────────────────────────────────────────────
 
   const CURATED_DESTINATIONS = [
@@ -322,6 +325,15 @@
     "Expat community",
   ];
 
+  // Returns priorities filtered to what's relevant for this family
+  const getRelevantPriorities = (profile) => {
+    return ALL_PRIORITIES.filter(p => {
+      if (p === "Child education" && profile.children.length === 0) return false;
+      if (p === "Pet-friendliness" && profile.pets.length === 0) return false;
+      return true;
+    });
+  };
+
   const WORK_SITUATIONS = [
     "Remote employee (US employer)",
     "Freelancer / self-employed",
@@ -353,7 +365,7 @@
 
     return (
       <div>
-        <p style={{ fontSize: 12, color: "#666", marginBottom: 10 }}>Drag to reorder — #1 is most important to your family</p>
+        <p style={{ fontSize: 13, color: "#666", marginBottom: 10 }}>Drag to reorder — #1 is most important to your family</p>
         {priorities.map((p, i) => (
           <div key={p} className="priority-item"
             draggable
@@ -362,7 +374,7 @@
             onDragEnd={handleDragEnd}
             onDragOver={e => e.preventDefault()}>
             <div className="priority-rank">{i + 1}</div>
-            <span style={{ fontSize: 13, flex: 1 }}>{p}</span>
+            <span style={{ fontSize: 14, flex: 1 }}>{p}</span>
             <span style={{ color: "#ccc", fontSize: 16 }}>⠿</span>
           </div>
         ))}
@@ -444,12 +456,12 @@
                   {/* Pros / Cons */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
                     <div style={{ padding: "10px", background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
-                      <strong style={{ fontSize: 11, color: "#166534", display: "block", marginBottom: 6 }}>✅ PROS</strong>
-                      {dest.pros?.map((p, i) => <div key={i} style={{ fontSize: 12, color: "#166534", marginBottom: 3 }}>• {p}</div>)}
+                      <strong style={{ fontSize: 12, color: "#166534", display: "block", marginBottom: 6 }}>✅ PROS</strong>
+                      {dest.pros?.map((p, i) => <div key={i} style={{ fontSize: 13, color: "#166534", marginBottom: 4 }}>• {p}</div>)}
                     </div>
                     <div style={{ padding: "10px", background: "#fef2f2", borderRadius: 8, border: "1px solid #fecaca" }}>
-                      <strong style={{ fontSize: 11, color: "#991b1b", display: "block", marginBottom: 6 }}>⚠️ CONS</strong>
-                      {dest.cons?.map((c, i) => <div key={i} style={{ fontSize: 12, color: "#991b1b", marginBottom: 3 }}>• {c}</div>)}
+                      <strong style={{ fontSize: 12, color: "#991b1b", display: "block", marginBottom: 6 }}>⚠️ CONS</strong>
+                      {dest.cons?.map((c, i) => <div key={i} style={{ fontSize: 13, color: "#991b1b", marginBottom: 4 }}>• {c}</div>)}
                     </div>
                   </div>
 
@@ -467,9 +479,9 @@
                           <div className="score-badge" style={{ background: color }}>{score}</div>
                           {data.label && <span style={{ fontSize: 10, padding: "2px 6px", background: color + "15", color: color, borderRadius: 4, border: `1px solid ${color}30`, fontWeight: 600 }}>{data.label}</span>}
                         </div>
-                        <p style={{ fontSize: 12, color: "#444", marginBottom: 4 }}>{data.summary}</p>
+                        <p style={{ fontSize: 13, color: "#444", marginBottom: 4 }}>{data.summary}</p>
                         {data.tailored && (
-                          <p style={{ fontSize: 11, color: "#2d5986", fontStyle: "italic", marginBottom: 4 }}>→ For your family: {data.tailored}</p>
+                          <p style={{ fontSize: 12, color: "#2d5986", fontStyle: "italic", marginBottom: 4 }}>→ For your family: {data.tailored}</p>
                         )}
                         {data.monthly && (
                           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
@@ -481,7 +493,7 @@
                           <div style={{ fontSize: 11, marginTop: 4, padding: "3px 8px", background: "#fafaf0", border: "1px solid #e0e0a0", borderRadius: 4, display: "inline-block" }}>Route: {data.hub}</div>
                         )}
                         {data.details && data.details.length > 0 && (
-                          <ul style={{ margin: "6px 0 0 0", paddingLeft: 16, fontSize: 11, color: "#555", lineHeight: 1.8 }}>
+                          <ul style={{ margin: "6px 0 0 0", paddingLeft: 16, fontSize: 13, color: "#555", lineHeight: 1.8 }}>
                             {data.details.map((d, i) => (
                               <li key={i} style={{ color: d.includes("⚠️") || d.includes("START") ? "#dc2626" : "#555" }}>{d}</li>
                             ))}
@@ -530,8 +542,20 @@
       carFree: true,
       mustHaves: [],
       destinations: [],
-      priorities: ALL_PRIORITIES.slice(0, 8),
+      priorities: ALL_PRIORITIES.filter(p => p !== "Child education" && p !== "Pet-friendliness"),
     });
+
+    // Re-sync priorities whenever children or pets change —
+    // add relevant ones if not present, remove irrelevant ones
+    useEffect(() => {
+      setProfile(p => {
+        const relevant = getRelevantPriorities(p);
+        // Keep existing order, just add/remove as needed
+        const kept = p.priorities.filter(pr => relevant.includes(pr));
+        const added = relevant.filter(pr => !p.priorities.includes(pr));
+        return { ...p, priorities: [...kept, ...added] };
+      });
+    }, [profile.children.length, profile.pets.length]);
     const [customDest, setCustomDest] = useState('');
     const [loading, setLoading] = useState(false);
     const [guide, setGuide] = useState(null);
