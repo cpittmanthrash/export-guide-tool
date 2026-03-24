@@ -558,8 +558,22 @@
     }, [profile.children.length, profile.pets.length]);
     const [customDest, setCustomDest] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingStage, setLoadingStage] = useState(0);
     const [guide, setGuide] = useState(null);
     const [error, setError] = useState(null);
+    const [retrySessionId, setRetrySessionId] = useState(null);
+    const [retryProfile, setRetryProfile] = useState(null);
+    const [retryCount, setRetryCount] = useState(0);
+
+    const LOADING_STAGES = [
+      "Verifying your payment…",
+      "Analyzing visa requirements for your work situation…",
+      "Scoring affordability against your budget…",
+      "Evaluating pet import complexity…",
+      "Checking school options for your children's ages…",
+      "Calculating flight routes from your home airport…",
+      "Compiling your personalized guide…",
+    ];
 
     // Check for Stripe return
     useEffect(() => {
@@ -570,9 +584,12 @@
       if (sessionId) {
         const savedProfile = localStorage.getItem('expat_profile');
         if (savedProfile) {
+          const parsedProfile = JSON.parse(savedProfile);
+          setRetrySessionId(sessionId);
+          setRetryProfile(parsedProfile);
           setLoading(true);
           setStep(5);
-          generateGuide(sessionId, JSON.parse(savedProfile));
+          generateGuide(sessionId, parsedProfile);
         }
       }
       if (cancelled) {
@@ -581,7 +598,17 @@
       }
     }, []);
 
+    // Animate loading stages
+    useEffect(() => {
+      if (!loading) { setLoadingStage(0); return; }
+      const interval = setInterval(() => {
+        setLoadingStage(s => Math.min(s + 1, LOADING_STAGES.length - 1));
+      }, 8000);
+      return () => clearInterval(interval);
+    }, [loading]);
+
     const generateGuide = async (sessionId, profileData) => {
+      setError(null);
       try {
         const res = await fetch(`${API_BASE}/api/generate-guide`, {
           method: 'POST',
@@ -593,14 +620,25 @@
         setGuide(data.guide);
         setStep(6);
         localStorage.removeItem('expat_profile');
-        // Clean URL
         window.history.replaceState({}, '', window.location.pathname);
       } catch (err) {
-        setError('Something went wrong generating your guide. Please contact support.');
         console.error(err);
+        setError(err.message || 'Something went wrong generating your guide.');
+        setStep(7); // error state
       } finally {
         setLoading(false);
       }
+    };
+
+    const handleRetry = () => {
+      if (retryCount >= 2) {
+        setError('We were unable to generate your guide after multiple attempts. Please email us at support@expatfamilyguide.com with your order and we will resolve it within 24 hours.');
+        return;
+      }
+      setRetryCount(c => c + 1);
+      setLoading(true);
+      setStep(5);
+      generateGuide(retrySessionId, retryProfile);
     };
 
     const handlePayment = async () => {
@@ -670,14 +708,67 @@
           <div className="loading-pulse">
             <div className="spinner" />
             <h2 style={{ fontWeight: "normal", color: "#1e3a5f" }}>Generating your personalized guide…</h2>
-            <p style={{ color: "#666", fontSize: 14 }}>Claude is researching each destination based on your family's specific profile. This takes about 30–60 seconds.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
-              {["Analyzing visa requirements for your work situation…","Scoring affordability against your budget…","Evaluating pet import complexity…","Checking school options for your children's ages…","Calculating flight routes from your home airport…"].map((msg, i) => (
-                <div key={i} style={{ fontSize: 12, color: "#888", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: "#c9a84c" }}>→</span> {msg}
+            <p style={{ color: "#666", fontSize: 14, marginBottom: 16 }}>
+              Claude is researching each destination based on your family's specific profile. This takes about 30–60 seconds.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, width: "100%", maxWidth: 380 }}>
+              {LOADING_STAGES.map((msg, i) => (
+                <div key={i} style={{
+                  fontSize: 13, display: "flex", alignItems: "center", gap: 8,
+                  color: i < loadingStage ? "#16a34a" : i === loadingStage ? "#1e3a5f" : "#ccc",
+                  transition: "color 0.4s"
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>
+                    {i < loadingStage ? "✓" : i === loadingStage ? "→" : "·"}
+                  </span>
+                  {msg}
                 </div>
               ))}
             </div>
+            <p style={{ fontSize: 11, color: "#bbb", marginTop: 20 }}>Don't close this tab — your guide is being generated</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Error screen with retry
+    if (step === 7) {
+      return (
+        <div style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1rem" }}>
+          <div style={{ background: "white", border: "1px solid #fecaca", borderRadius: 16, padding: "2.5rem 2rem", textAlign: "center" }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+            <h2 style={{ fontWeight: "normal", color: "#1e3a5f", marginBottom: 10 }}>Something went wrong</h2>
+            <p style={{ fontSize: 14, color: "#555", lineHeight: 1.7, marginBottom: 8 }}>
+              Your payment went through successfully, but we hit an error generating your guide.
+            </p>
+            <div style={{ padding: "10px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, marginBottom: 20, fontSize: 12, color: "#991b1b", textAlign: "left" }}>
+              <strong>Error:</strong> {error}
+            </div>
+
+            {retryCount < 2 ? (
+              <div>
+                <p style={{ fontSize: 13, color: "#666", marginBottom: 16 }}>
+                  This usually resolves itself — click below to try again at no charge.
+                  {retryCount === 1 ? " (Final attempt)" : ""}
+                </p>
+                <button className="btn-primary" onClick={handleRetry} style={{ marginBottom: 16 }}>
+                  {retryCount === 0 ? "Try Again — No Charge" : "Try One More Time"}
+                </button>
+                <br />
+              </div>
+            ) : (
+              <div style={{ padding: "12px 16px", background: "#fef3c7", border: "1px solid #f59e0b", borderRadius: 8, marginBottom: 16, fontSize: 13, color: "#78350f" }}>
+                We were unable to generate your guide after multiple attempts.
+              </div>
+            )}
+
+            <p style={{ fontSize: 13, color: "#666" }}>
+              Still having trouble? Email us at{" "}
+              <a href="mailto:support@expatfamilyguide.com" style={{ color: "#2d5986" }}>
+                support@expatfamilyguide.com
+              </a>
+              {" "}with your order and we'll resolve it or issue a full refund within 24 hours.
+            </p>
           </div>
         </div>
       );
@@ -701,7 +792,7 @@
             <div style={{ background: "linear-gradient(135deg, #1e3a5f 0%, #2d5986 100%)", borderRadius: 16, padding: "2.5rem 2rem", marginBottom: "1.5rem", color: "white", textAlign: "center" }}>
               <div style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c9a84c", marginBottom: 10 }}>Expat Family Research Tool</div>
               <h1 style={{ fontSize: "clamp(1.6rem, 5vw, 2.6rem)", fontWeight: "normal", lineHeight: 1.2, marginBottom: 14 }}>
-                Stop drowning in tabs.<br />Get a personalized guide built for you and your family.
+                Stop drowning in tabs.<br />Get a guide built for your family.
               </h1>
               <p style={{ fontSize: 15, color: "#b8cfe8", lineHeight: 1.7, maxWidth: 480, margin: "0 auto 20px" }}>
                 Researching a move abroad means juggling visa rules, cost of living calculators, school options, pet import requirements, and flight routes — for every city you're considering, all at once.
@@ -738,7 +829,7 @@
               <div style={{ fontSize: 28, flexShrink: 0 }}>💬</div>
               <div>
                 <p style={{ fontSize: 13, color: "#555", lineHeight: 1.7, fontStyle: "italic" }}>
-                  "I've lived abroad in the past and have always wanted to do it again, but I kept putting off the research I knew I'd have to do now that I've gone from a party of 1 to a family of 3 + 1 cat. If I had this tool, there would've been no need to put it off. I'd have had all the research curated for me and my family in just a few minutes."
+                  "I spent three weeks in spreadsheets before my sabbatical trying to compare Mexico City, Montréal, and Barcelona for our family — visa rules, schools for our 4-year-old, what to do with our cat. This tool would have saved me all of it."
                 </p>
                 <p style={{ fontSize: 11, color: "#999", marginTop: 6 }}>— The person who built this tool, after doing it the hard way</p>
               </div>
