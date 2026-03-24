@@ -383,8 +383,9 @@
   }
 
   // ── GUIDE DISPLAY ──────────────────────────────────────────────────────────
-  function GuideDisplay({ guide, profile }) {
+  function GuideDisplay({ guide, profile, onClearGuide }) {
     const [expanded, setExpanded] = useState(0);
+    const [pdfLoading, setPdfLoading] = useState(false);
 
     const cats = [
       { id: "visa", label: "Visa", icon: "✈️" },
@@ -397,8 +398,60 @@
       { id: "english", label: "English", icon: "🗣️" },
     ];
 
+    const handleDownloadPDF = async () => {
+      setPdfLoading(true);
+      try {
+        // Dynamically load html2pdf
+        await new Promise((resolve, reject) => {
+          if (window.html2pdf) { resolve(); return; }
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+
+        // Expand all destinations before printing
+        const allExpanded = document.getElementById('guide-content');
+        const opts = {
+          margin: [10, 10, 10, 10],
+          filename: `expat-guide-${new Date().toISOString().slice(0,10)}.pdf`,
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: { scale: 1.5, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+        };
+        await window.html2pdf().set(opts).from(allExpanded).save();
+      } catch (e) {
+        alert('PDF download failed. Please try printing the page instead (Ctrl/Cmd + P).');
+      } finally {
+        setPdfLoading(false);
+      }
+    };
+
     return (
       <div>
+        {/* Saved banner */}
+        <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 16px", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ color: "#16a34a", fontSize: 16 }}>✓</span>
+            <span style={{ fontSize: 13, color: "#166534" }}>
+              <strong>Your guide is saved in this browser.</strong> You can close this tab and return to this URL to retrieve it.
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={handleDownloadPDF} disabled={pdfLoading}
+              style={{ padding: "6px 14px", background: "#1e3a5f", color: "white", border: "none", borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: pdfLoading ? "not-allowed" : "pointer", opacity: pdfLoading ? 0.7 : 1 }}>
+              {pdfLoading ? "Preparing PDF…" : "⬇ Download PDF"}
+            </button>
+            <button onClick={onClearGuide}
+              style={{ padding: "6px 12px", background: "white", color: "#666", border: "1px solid #d1d5db", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>
+              Start new guide
+            </button>
+          </div>
+        </div>
+
+        <div id="guide-content">
         <div className="guide-header">
           <div style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#c9a84c", marginBottom: 6 }}>Your Personalized Expat Guide</div>
           <h1 style={{ fontSize: "clamp(1.3rem, 3vw, 2rem)", fontWeight: "normal", marginBottom: 8 }}>Where Should Your Family Live?</h1>
@@ -525,6 +578,19 @@
           Visa rules and costs change frequently — verify with official consulate and government sources •
           Not legal or immigration advice
         </div>
+        </div> {/* end guide-content */}
+
+        {/* Bottom action bar */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, padding: "1.5rem 0", flexWrap: "wrap" }}>
+          <button onClick={handleDownloadPDF} disabled={pdfLoading}
+            style={{ padding: "10px 24px", background: "#1e3a5f", color: "white", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: pdfLoading ? "not-allowed" : "pointer", opacity: pdfLoading ? 0.7 : 1 }}>
+            {pdfLoading ? "Preparing PDF…" : "⬇ Download PDF"}
+          </button>
+          <button onClick={onClearGuide}
+            style={{ padding: "10px 20px", background: "white", color: "#1e3a5f", border: "1px solid #1e3a5f", borderRadius: 8, fontSize: 14, cursor: "pointer" }}>
+            Start a new guide
+          </button>
+        </div>
       </div>
     );
   }
@@ -575,8 +641,11 @@
       "Compiling your personalized guide…",
     ];
 
-    // Check for Stripe return
+    // Check for Stripe return — only if no saved guide was already restored
     useEffect(() => {
+      const saved = localStorage.getItem('expat_saved_guide');
+      if (saved) return; // already handled by the restore effect above
+
       const params = new URLSearchParams(window.location.search);
       const sessionId = params.get('session_id');
       const cancelled = params.get('cancelled');
@@ -619,14 +688,49 @@
         if (data.error) throw new Error(data.error);
         setGuide(data.guide);
         setStep(6);
+        // Save guide to localStorage so user can return to it
+        try {
+          localStorage.setItem('expat_saved_guide', JSON.stringify(data.guide));
+          localStorage.setItem('expat_saved_date', new Date().toISOString());
+        } catch(e) { /* localStorage full or blocked — not critical */ }
         localStorage.removeItem('expat_profile');
         window.history.replaceState({}, '', window.location.pathname);
       } catch (err) {
         console.error(err);
         setError(err.message || 'Something went wrong generating your guide.');
-        setStep(7); // error state
+        setStep(7);
       } finally {
         setLoading(false);
+      }
+    };
+
+    // Check for a previously saved guide on first load
+    useEffect(() => {
+      const saved = localStorage.getItem('expat_saved_guide');
+      const savedDate = localStorage.getItem('expat_saved_date');
+      if (saved && savedDate) {
+        // Only restore if saved within last 90 days
+        const age = Date.now() - new Date(savedDate).getTime();
+        const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+        if (age < ninetyDays) {
+          try {
+            setGuide(JSON.parse(saved));
+            setStep(6);
+            return; // Skip Stripe check below if we restored a guide
+          } catch(e) { /* corrupted — ignore */ }
+        } else {
+          localStorage.removeItem('expat_saved_guide');
+          localStorage.removeItem('expat_saved_date');
+        }
+      }
+    }, []);
+
+    const handleClearGuide = () => {
+      if (window.confirm('This will clear your saved guide. Are you sure?')) {
+        localStorage.removeItem('expat_saved_guide');
+        localStorage.removeItem('expat_saved_date');
+        setGuide(null);
+        setStep(1);
       }
     };
 
@@ -764,10 +868,10 @@
 
             <p style={{ fontSize: 13, color: "#666" }}>
               Still having trouble? Email us at{" "}
-              <a href="mailto:chelsea@thehoneyline.co" style={{ color: "#2d5986" }}>
+              <a href="mailto:support@expatfamilyguide.com" style={{ color: "#2d5986" }}>
                 support@expatfamilyguide.com
               </a>
-              {" "}with your order and we'll resolve it or issue a full refund within 48 hours.
+              {" "}with your order and we'll resolve it or issue a full refund within 24 hours.
             </p>
           </div>
         </div>
@@ -777,7 +881,7 @@
     if (step === 6 && guide) {
       return (
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "1rem" }}>
-          <GuideDisplay guide={guide} profile={profile} />
+          <GuideDisplay guide={guide} profile={profile} onClearGuide={handleClearGuide} />
         </div>
       );
     }
